@@ -6,8 +6,8 @@ float latitude,longitude;
 int distance;
 char charreceived[32];
 //Pole location
-const float fixedlat = 10.112907;//30.236641; 
-const float fixedlong = 76.350540;//-97.821457;
+const float fixedlat = 10.113079;//30.236641; 
+const float fixedlong = 76.351358;//-97.821457;
 
 
 void setup() {
@@ -37,9 +37,9 @@ void loop() {
     
     //Array to string
     String received = charreceived;
-    //Serial.println(received);
+    Serial.println(received);
     //splitting received string and converting to float
-    latitude =received.substring(0,8).toFloat();
+    latitude =received.substring(0,9).toFloat();
     longitude = received.substring(9).toFloat();
     Serial.print("Latitude : ");
     Serial.println(latitude,6);
