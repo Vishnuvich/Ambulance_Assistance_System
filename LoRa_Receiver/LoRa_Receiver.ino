@@ -1,12 +1,13 @@
 #include <SPI.h>
 #include <LoRa.h>
+#include <TinyGPS++.h>
 
 float latitude,longitude;
 int distance;
 char charreceived[32];
 //Pole location
-const float fixedlat = 30.236641; 
-const float fixedlong = -97.821457;
+const float fixedlat = 10.112907;//30.236641; 
+const float fixedlong = 76.350540;//-97.821457;
 
 
 void setup() {
@@ -45,7 +46,8 @@ void loop() {
     Serial.print("Longitude :");
     Serial.println(longitude,6);
     //Distance calculation, returns distance in meter
-    distance = TinyGPSPlus::LoRa.distanceBetween(latitude,longitude,fixedlat,fixedlong);
+    distance = TinyGPSPlus::distanceBetween(latitude,longitude,fixedlat,fixedlong);
+      Serial.println(distance);
       if (distance < 100 ) 
         {
           Serial.println(distance);
