@@ -2,6 +2,7 @@
 #include <LoRa.h>
 
 float latitude,longitude;
+int distance;
 char charreceived[32];
 //Pole location
 const float fixedlat = 30.236641; 
@@ -13,13 +14,13 @@ void setup() {
   while (!Serial);
 
   Serial.println("LoRa Receiver");
-LoRa.setPins(15,16,4);
+  LoRa.setPins(15,16,4);
   if (!LoRa.begin(473E6)) {
     Serial.println("Starting LoRa failed!");
     while (1);
   }
-
 }
+
 void loop() {
    int a = 0;
   // try to parse packet
@@ -27,12 +28,12 @@ void loop() {
   if (packetSize) {
     // read packet
     while (LoRa.available()) {
-       char receiv = LoRa.read();
+       char receiv = LoRa.read();//receives one character at a time(iteration)
        //storing each char to an array
        charreceived[a]=receiv;
        a++;
-
     }
+    
     //Array to string
     String received = charreceived;
     //Serial.println(received);
@@ -43,8 +44,14 @@ void loop() {
     Serial.println(latitude,6);
     Serial.print("Longitude :");
     Serial.println(longitude,6);
-    //Distance calculation
-    Serial.println(TinyGPSPlus::LoRa.distanceBetween(latitude,longitude,fixedlat,fixedlong));
+    //Distance calculation, returns distance in meter
+    distance = TinyGPSPlus::LoRa.distanceBetween(latitude,longitude,fixedlat,fixedlong);
+      if (distance < 100 ) 
+        {
+          Serial.println(distance);
+          Serial.println("Ambulance passed the pollling station");
+        }
+    
     
       
     // print RSSI of packet
