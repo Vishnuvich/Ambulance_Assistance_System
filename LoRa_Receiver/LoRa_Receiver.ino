@@ -22,7 +22,7 @@ void setup() {
     while (1);
   }
 }
-/*--------------------------LoRa Receive Function----------------------------*/
+/*--------------------------------------------------LoRa Receive Function----------------------------------------------------------*/
 
 String LoRa_Receive()
 {
@@ -40,7 +40,7 @@ String LoRa_Receive()
     return received;
 }
 
-/*--------------------------------Fuction for distance checking and extracting lat and long values--------------------------*/
+/*--------------------------------Fuction for distance checking and extracting lat and long values--------------------------------*/
 
 void distance_Check(String received_data)
 {
@@ -54,7 +54,7 @@ void distance_Check(String received_data)
     //Distance calculation, returns distance in meter
     distance = TinyGPSPlus::distanceBetween(latitude,longitude,fixedlat,fixedlong);
       Serial.println(distance);
-      if (distance < 100 ) 
+      if (distance < 100 ) //give the difference in distance here
         {
           Serial.println(distance);
           Serial.println("Ambulance passed the pollling station");
@@ -69,9 +69,8 @@ void loop() {
   if (packetSize) {
     received_data = LoRa_Receive();//calling user defined lora receive function which returns the received string
     Serial.println(received_data);
-    
+    //Checking the distance between ambulance and polling station
     distance_Check(received_data);
-      
     // print RSSI of packet
     Serial.print("' with RSSI ");
     Serial.println(LoRa.packetRssi());
