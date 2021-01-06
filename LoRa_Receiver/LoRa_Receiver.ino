@@ -69,7 +69,10 @@ void onReceive(int packetSize) {
   }
 
   // if message is for this device, or broadcast, print details:
-
+  if (incoming == "A")
+  {
+    while(1);
+  }
 }
 
 
@@ -122,12 +125,13 @@ void loop()
     if (distance_Check(received_data)== true)
     {
      //Give Speaker code here
-     if(millis() - lastSendTime > interval)
+     
+     if(millis() - lastSendTime > interval)//Checking the interval for sending data to next pole
      {
-     LoRa_Sender("ToHospital");//Alerting next pole
+     LoRa_Sender("ToHospital");//Alerting next pole(Sending to next pole)
      lastSendTime = millis();
      }
-     onReceive(LoRa.parsePacket());
+     onReceive(LoRa.parsePacket());//Check for acknowledgement
     }
     // print RSSI of packet
     Serial.print("' with RSSI ");
