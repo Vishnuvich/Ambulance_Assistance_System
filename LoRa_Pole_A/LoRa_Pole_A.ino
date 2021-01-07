@@ -6,11 +6,11 @@ byte destination = 0xBB;      // destination to send to
 void LoRa_Sender(String outgoing)
 {
     LoRa.beginPacket();
-    LoRa.print(destination);              // add destination address
-    LoRa.print(localAddress);             // add sender address
-    LoRa.print(outgoing.length());        // add payload length
+    LoRa.write(destination);              // add destination address
+    LoRa.write(localAddress);             // add sender address
+    LoRa.write(outgoing.length());        // add payload length
     LoRa.print(outgoing);                 // add payload
-    Serial.println("Send data to next pole");
+    Serial.println("Ack Send");
     LoRa.endPacket();
 }
 
@@ -32,6 +32,7 @@ void loop()
   int packetsize = LoRa.parsePacket();
   if(packetsize)
   {
+    
     int  recipient = LoRa.read();
     byte sender = LoRa.read();
     byte incominglength = LoRa.read();
@@ -41,18 +42,18 @@ void loop()
 
       incoming += (char)LoRa.read();
     }
-
+    Serial.println(incoming);
     if (recipient != localAddress ) {
     Serial.println("This message is not for me.");
     return;                             // skip rest of function
   }
   
-    if (incoming == "ToHospital")
+    if (incoming == "To")
     {
-      Serial.println("recipient :",String(recipient,HEX);
-      Serial.println("Sender :",String(sender,HEX);
+      Serial.println("recipient :"+String(recipient,HEX));
+      Serial.println("Sender :"+String(sender,HEX));
       Serial.println("Incoming length");
-      Serial.println(incominglegth);
+      Serial.println(incominglength);
       Serial.println(incoming);
       LoRa_Sender("A");
     }
