@@ -49,10 +49,8 @@ void loop()
   
     if (incoming == "ToHospital")
     {
-      Serial.println("recipient :");
-      Serial.println(recipient);
-      Serial.println("Sender :");
-      Serial.println(sender);
+      Serial.println("recipient :",String(recipient,HEX);
+      Serial.println("Sender :",String(sender,HEX);
       Serial.println("Incoming length");
       Serial.println(incominglegth);
       Serial.println(incoming);
