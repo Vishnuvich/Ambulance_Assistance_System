@@ -5,28 +5,80 @@
 float latitude,longitude;
 int distance;
 char charreceived[32];
-String received, received_data;
+String received, received_data, outgoing;
+byte localAddress = 0xBB;     // address of this device
+byte destination = 0xFF;      // destination to send to
+long lastSendTime = 0;        // last send time
+int interval = 2000;          // interval between sends
 //Pole location
 const float fixedlat = 10.113079;//30.236641; 
 const float fixedlong = 76.351358;//-97.821457;
+
+/*--------------------------------------------------LoRa Sender Function----------------------------------------------------------*/
+
+void LoRa_Sender(String outgoing)
+{
+    LoRa.beginPacket();
+    LoRa.write(destination);              // add destination address
+    LoRa.write(localAddress);             // add sender address
+    LoRa.write(outgoing.length());        // add payload length
+    LoRa.print(outgoing);                 // add payload
+    Serial.println("Send data to next pole");
+    LoRa.endPacket();
+}
+
 
 /*--------------------------------------------------LoRa Receive Function----------------------------------------------------------*/
 
 String LoRa_Receive()
 {
-  int a = 0;
+  String received = "";
   // read packet
       while (LoRa.available()) 
     {
-       char receiv = LoRa.read();//receives one character at a time(iteration)
-       //storing each char to an array
-       charreceived[a]=receiv;
-       a++;
+        received += (char)LoRa.read();//receives data
     }
-    //Array to string
-    received = charreceived; //here the variable "received" is a string type
     return received;
 }
+
+/*--------------------------------------------------LoRa Receiving Ack Function----------------------------------------------------------*/
+
+void onReceive(int packetSize) {
+  if (packetSize == 0) return;          // if there's no packet, return
+
+  // read packet header bytes:
+  int recipient = LoRa.read();          // recipient address
+  byte sender = LoRa.read();            // sender address
+  byte incomingLength = LoRa.read();    // incoming msg length
+
+  String incoming = "";
+
+  while (LoRa.available()) {
+    incoming += (char)LoRa.read();
+  }
+
+  if (incomingLength != incoming.length()) {   // check length for error
+    Serial.println("error: message length does not match length");
+    return;                             // skip rest of function
+  }
+
+  // if the recipient isn't this device or broadcast,
+  if (recipient != localAddress ) {
+    Serial.println("This message is not for me.");
+    return;                             // skip rest of function
+  }
+
+  // if message is for this device, or broadcast, print details:
+  if (incoming == "A")
+  {
+    while(1)
+        {
+      Serial.println("Works");
+      delay(2000);
+        }
+  }
+}
+
 
 /*--------------------------------Fuction for distance checking and extracting lat and long values--------------------------------*/
 
@@ -76,10 +128,17 @@ void loop()
     /*Checking the distance between ambulance and polling station,if it is less than specified value the function returns "true"*/
     if (distance_Check(received_data)== true)
     {
-     Serial.println("Works"); 
+     //Give Speaker code here
+     
+     if(millis() - lastSendTime > interval)//Checking the interval for sending data to next pole
+     {
+     LoRa_Sender("To");//Alerting next pole(Sending to next pole)
+     lastSendTime = millis();
+     }
+     onReceive(LoRa.parsePacket());//Check for acknowledgement
     }
     // print RSSI of packet
-    Serial.print("' with RSSI ");
-    Serial.println(LoRa.packetRssi());
+    //Serial.print("' with RSSI ");
+    //Serial.println(LoRa.packetRssi());
   }
 }
