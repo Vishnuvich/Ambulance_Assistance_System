@@ -71,15 +71,11 @@ void onReceive(int packetSize) {
   // if message is for this device, or broadcast, print details:
   if (incoming == "A")
   {
-<<<<<<< HEAD
     while(1)
         {
       Serial.println("Works");
       delay(2000);
         }
-=======
-    while(1);
->>>>>>> b7c72f8e1a683b3b81b4ecc2d67f6836e0c85503
   }
 }
 
@@ -136,11 +132,7 @@ void loop()
      
      if(millis() - lastSendTime > interval)//Checking the interval for sending data to next pole
      {
-<<<<<<< HEAD
      LoRa_Sender("To");//Alerting next pole(Sending to next pole)
-=======
-     LoRa_Sender("ToHospital");//Alerting next pole(Sending to next pole)
->>>>>>> b7c72f8e1a683b3b81b4ecc2d67f6836e0c85503
      lastSendTime = millis();
      }
      onReceive(LoRa.parsePacket());//Check for acknowledgement
