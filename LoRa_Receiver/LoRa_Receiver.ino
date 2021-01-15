@@ -11,8 +11,8 @@ byte destination = 0xFF;      // destination to send to
 long lastSendTime = 0;        // last send time
 int interval = 2000;          // interval between sends
 //Pole location
-const float fixedlat = 10.113079;//30.236641; 
-const float fixedlong = 76.351358;//-97.821457;
+const float fixedlat =30.236641;// 10.113079;// 
+const float fixedlong =-97.821457;// 76.351358;//
 
 /*--------------------------------------------------LoRa Sender Function----------------------------------------------------------*/
 
@@ -129,13 +129,16 @@ void loop()
     if (distance_Check(received_data)== true)
     {
      //Give Speaker code here
-     
+     while(1)
+     {
      if(millis() - lastSendTime > interval)//Checking the interval for sending data to next pole
      {
      LoRa_Sender("To");//Alerting next pole(Sending to next pole)
      lastSendTime = millis();
      }
      onReceive(LoRa.parsePacket());//Check for acknowledgement
+    delay(0);
+    }
     }
     // print RSSI of packet
     //Serial.print("' with RSSI ");
