@@ -32,8 +32,9 @@ void loop()
   int packetsize = LoRa.parsePacket();
   if(packetsize)
   {
-    
+    Serial.println("Hi");
     int  recipient = LoRa.read();
+    Serial.println("recipient :"+String(recipient,HEX));
     byte sender = LoRa.read();
     byte incominglength = LoRa.read();
     String incoming = "";
@@ -41,8 +42,9 @@ void loop()
     {
 
       incoming += (char)LoRa.read();
+      Serial.println(incoming);
+      delay(0);
     }
-    Serial.println(incoming);
     if (recipient != localAddress ) {
     Serial.println("This message is not for me.");
     return;                             // skip rest of function
