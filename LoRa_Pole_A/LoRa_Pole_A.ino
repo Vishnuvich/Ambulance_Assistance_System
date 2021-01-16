@@ -41,7 +41,7 @@ String LoRa_Receive()
 }
 /*-------------------------------------- LoRa_Alert Receiving Function -----------------*/
 
-void onReceive_Alert()
+int onReceive_Alert()
 {   
     int  recipient = LoRa.read();
     Serial.println("recipient :"+String(recipient,HEX));
@@ -56,17 +56,9 @@ void onReceive_Alert()
       delay(0);
     }
 
-    if (incomingLength != incoming.length()) 
-    {   // check length for error
-    Serial.println("error: message length does not match length");
-    return;                             // skip rest of function
-    }
+    length_Check(incomingLength, incoming); //checks incoming length
     
-    if (recipient != localAddress ) 
-    {
-    Serial.println("This message is not for me.");
-    return;                             // skip rest of function
-    }
+    address_Check(recipient);
   
     if (incoming == "To")
     {
@@ -76,7 +68,28 @@ void onReceive_Alert()
       Serial.println(incomingLength);
       Serial.println(incoming);
        LoRa_Sender("A",destination); //Send Ack back 
+       return true;
     }
+}
+
+/*--------------------------------------------------Recepient address check-----------------------------------------*/
+void address_Check(int recipient)
+{
+    // if the recipient isn't this device or broadcast,
+  if (recipient != localAddress ) {
+    Serial.println("This message is not for me.");
+    return;                             // skip rest of function
+  }
+}
+
+/*-------------------------------------------------- Length check----------------------------------*/
+
+void length_Check(byte incomingLength, String incoming)
+{
+    if (incomingLength != incoming.length()) {   // check length for error
+    Serial.println("error: message length does not match length");
+    return;                             // skip rest of function
+  }
 }
 
 /*--------------------------------------------------LoRa Receiving Ack Function----------------------------------------------------------*/
@@ -96,17 +109,8 @@ void onReceive(int packetSize) {
     incoming += (char)LoRa.read();
   }
 
-  if (incomingLength != incoming.length()) {   // check length for error
-    Serial.println("error: message length does not match length");
-    return;                             // skip rest of function
-  }
-
-  // if the recipient isn't this device or broadcast,
-  if (recipient != localAddress ) {
-    Serial.println("This message is not for me.");
-    return;                             // skip rest of function
-  }
-
+  address_Check(recipient);
+  length_Check(incomingLength, incoming);
   // if message is for this device, or broadcast, print details:
   if (incoming == "A")
   {
@@ -161,7 +165,8 @@ void loop()
   int packetsize = LoRa.parsePacket();
   if(packetsize)
   {
-    onReceive_Alert(); // receives alert and sends ack
+   if ( onReceive_Alert() == true) 
+   {
 
     // Give code for speaker here
 
@@ -181,5 +186,6 @@ void loop()
     delay(0);
     }
     }
+   }
   }
 }
