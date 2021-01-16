@@ -6,8 +6,8 @@ float latitude,longitude;
 int distance;
 char charreceived[32];
 String received, received_data, outgoing;
-byte localAddress = 0xBB;     // address of this device
-byte destination = 0xFF;      // destination to send to
+byte localAddress = 0xAA;     // address of this device
+byte destination = 0xBB;      // destination to send to
 long lastSendTime = 0;        // last send time
 int interval = 2000;          // interval between sends
 //Pole location
@@ -16,7 +16,7 @@ const float fixedlong =-97.821457;// 76.351358;//
 
 /*--------------------------------------------------LoRa Sender Function----------------------------------------------------------*/
 
-void LoRa_Sender(String outgoing)
+void LoRa_Sender(String outgoing, byte destination)
 {
     LoRa.beginPacket();
     LoRa.write(destination);              // add destination address
@@ -37,6 +37,7 @@ String LoRa_Receive()
       while (LoRa.available()) 
     {
         received += (char)LoRa.read();//receives data
+        Serial.println(received);
     }
     return received;
 }
@@ -44,7 +45,8 @@ String LoRa_Receive()
 /*--------------------------------------------------LoRa Receiving Ack Function----------------------------------------------------------*/
 
 void onReceive(int packetSize) {
-  if (packetSize == 0) return;          // if there's no packet, return
+  if (packetSize == 0) 
+  return;          // if there's no packet, return
 
   // read packet header bytes:
   int recipient = LoRa.read();          // recipient address
@@ -128,12 +130,12 @@ void loop()
     /*Checking the distance between ambulance and polling station,if it is less than specified value the function returns "true"*/
     if (distance_Check(received_data)== true)
     {
-     //Give Speaker code here
+     //Give Speaker code here if needed
      while(1)
      {
      if(millis() - lastSendTime > interval)//Checking the interval for sending data to next pole
      {
-     LoRa_Sender("To");//Alerting next pole(Sending to next pole)
+     LoRa_Sender("To", destination);//Alerting next pole(Sending to next pole)
      lastSendTime = millis();
      }
      onReceive(LoRa.parsePacket());//Check for acknowledgement
