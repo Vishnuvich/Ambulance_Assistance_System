@@ -27,11 +27,11 @@ void loop() {
     if (gps.encode(ss.read()))
       displayInfo();
 
-  //if (millis() > 5000 && gps.charsProcessed() < 10)
-  //{
-    //Serial.println(F("No GPS detected: check wiring."));
-   /// while(true);
-  //}
+  if (millis() > 5000 && gps.charsProcessed() < 10)
+  {
+    Serial.println(F("No GPS detected: check wiring."));
+    while(true);
+  }
 }
 
 void displayInfo()
