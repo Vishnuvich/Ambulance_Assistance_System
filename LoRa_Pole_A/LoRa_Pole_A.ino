@@ -11,23 +11,23 @@ byte nxt_destination = 0xCC;  // destination address of next pole
 long lastSendTime = 0;        // last send time
 int interval = 2000;          // interval between sends
 //Pole location
-const float fixedlat =30.236641;// 10.113079;// 
-const float fixedlong =-97.821457;// 76.351358;//
+const float fixedlat = 30.236641;// 10.113079;// 
+const float fixedlong = -97.821457;// 76.351358;//
 
-/*------------------------------------------- LoRa_Sender----------------------------------*/
+/*------------------------------------------- LoRa_Sender ----------------------------------*/
 
-void LoRa_Sender(String outgoing, byte destination)
+void LoRa_Sender(String outgoing, byte destination, String Mssg)
 {
     LoRa.beginPacket();
     LoRa.write(destination);              // add destination address
     LoRa.write(localAddress);             // add sender address
     LoRa.write(outgoing.length());        // add payload length
     LoRa.print(outgoing);                 // add payload
-    Serial.println("Ack Send");
+    Serial.println(Mssg);
     LoRa.endPacket();
 }
 
-/*--------------------------------------------------LoRa Receive Function----------------------------------------------------------*/
+/*-------------------------------------------------- LoRa Receive Function ----------------------------------------------------------*/
 
 String LoRa_Receive()
 {
@@ -52,7 +52,7 @@ int onReceive_Alert()
     {
 
       incoming += (char)LoRa.read();
-      Serial.println(incoming);
+      //Serial.println(incoming);
       delay(0);
     }
 
@@ -67,12 +67,15 @@ int onReceive_Alert()
       Serial.println("Incoming length");
       Serial.println(incomingLength);
       Serial.println(incoming);
-       LoRa_Sender("A",destination); //Send Ack back 
+      for (int i=0; i<10; i++)
+      {
+       LoRa_Sender("A",destination,"Ack Send to 0xAA"); //Send Ack back 
+      }
        return true;
     }
 }
 
-/*--------------------------------------------------Recepient address check-----------------------------------------*/
+/*-------------------------------------------------- Recepient address check -----------------------------------------*/
 void address_Check(int recipient)
 {
     // if the recipient isn't this device or broadcast,
@@ -82,7 +85,7 @@ void address_Check(int recipient)
   }
 }
 
-/*-------------------------------------------------- Length check----------------------------------*/
+/*-------------------------------------------------- Length check ----------------------------------*/
 
 void length_Check(byte incomingLength, String incoming)
 {
@@ -92,7 +95,7 @@ void length_Check(byte incomingLength, String incoming)
   }
 }
 
-/*--------------------------------------------------LoRa Receiving Ack Function----------------------------------------------------------*/
+/*-------------------------------------------------- LoRa Receiving Ack Function ----------------------------------------------------------*/
 
 void onReceive(int packetSize) {
   if (packetSize == 0) 
@@ -111,7 +114,9 @@ void onReceive(int packetSize) {
 
   address_Check(recipient);
   length_Check(incomingLength, incoming);
+  
   // if message is for this device, or broadcast, print details:
+  
   if (incoming == "A")
   {
     while(1)
@@ -122,7 +127,7 @@ void onReceive(int packetSize) {
   }
 }
 
-/*--------------------------------Fuction for distance checking and extracting lat and long values--------------------------------*/
+/*-------------------------------- Function for distance checking and extracting lat and long values --------------------------------*/
 
 int distance_Check(String received_data)
 {
@@ -133,6 +138,7 @@ int distance_Check(String received_data)
     Serial.println(latitude,6);
     Serial.print("Longitude :");
     Serial.println(longitude,6);
+    
     //Distance calculation, returns distance in meter
     distance = TinyGPSPlus::distanceBetween(latitude,longitude,fixedlat,fixedlong);
       Serial.println(distance);
@@ -141,7 +147,7 @@ int distance_Check(String received_data)
           Serial.println(distance);
           Serial.println("Ambulance passed the pollling station");
           return true;/* returns true if the condition is satisfied ie, when the ambulance is within the specified range 
-                       of station or we can say that the ambulance crossed the polling station*/
+                       of station or we can say that the ambulance crossed the polling station */
         }
 }
 
@@ -172,6 +178,7 @@ void loop()
 
     received_data = LoRa_Receive(); //recieves location data from ambulance
     Serial.println(received_data);
+    
     /*Checking the distance between ambulance and polling station,if it is less than specified value the function returns "true"*/
     if (distance_Check(received_data)== true)
     {
@@ -179,7 +186,7 @@ void loop()
      {  
      if(millis() - lastSendTime > interval)//Checking the interval for sending data to next pole
      {
-     LoRa_Sender("To", nxt_destination);//Alerting next pole(Sending to next pole)
+     LoRa_Sender("To", nxt_destination, "Alert to nxt pole 0xCC");//Alerting next pole(Sending to next pole)
      lastSendTime = millis();
      }
      onReceive(LoRa.parsePacket());//Check for acknowledgement
