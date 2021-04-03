@@ -65,23 +65,23 @@ void setup() {
 
 void loop() {
 
-    while (ss.available() > 0)
-    if (gps.encode(ss.read()))
-    {
-      displayInfo();
-       delay(2000);
-    }
+//    while (ss.available() > 0)
+//    if (gps.encode(ss.read()))
+//    {
+//      displayInfo();
+//       delay(2000);
+//    }
 //      if (millis() > 5000 && gps.charsProcessed() < 10)
 //  {
 //    Serial.println(F("No GPS detected: check wiring."));
 //    
 //  }
  
-  }
-//   const char *gpsStream = "$GPRMC,045103.000,A,3014.1984,N,09749.2872,W,0.67,161.46,030913,,,A*7C\r\n";
-//   while(*gpsStream)
-//    if (gps.encode(*gpsStream++)){
-//      displayInfo();
-//    }
-//    delay(3000);
-//}
+//  }
+   const char *gpsStream = "$GPRMC,045103.000,A,3014.1984,N,09749.2872,W,0.67,161.46,030913,,,A*7C\r\n";
+   while(*gpsStream)
+    if (gps.encode(*gpsStream++)){
+      displayInfo();
+    }
+    delay(3000);
+}

@@ -37,7 +37,7 @@ String LoRa_Receive()
       while (LoRa.available()) 
     {
         received += (char)LoRa.read();//receives data
-        Serial.println(received);
+        //Serial.println(received);
     }
     return received;
 }
@@ -122,6 +122,7 @@ void setup() {
 
 void loop() 
 {   
+  
   int packetSize = LoRa.parsePacket();// try to parse packet
   if (packetSize) 
   {
