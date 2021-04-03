@@ -3,8 +3,8 @@
 #include <TinyGPS++.h>
 
 float latitude,longitude;
-int distance;
-String received, received_data, outgoing;
+int distance, Alert_return_value;
+String received_data, outgoing;
 byte localAddress = 0xBB;     // address of this device
 byte destination = 0xAA;      // destination to send to
 byte nxt_destination = 0xCC;  // destination address of next pole
@@ -13,6 +13,27 @@ int interval = 2000;          // interval between sends
 //Pole location
 const float fixedlat = 30.236641;// 10.113079;// 
 const float fixedlong = -97.821457;// 76.351358;//
+
+
+/*-------------------------------------------------- Recepient address check -----------------------------------------*/
+void address_Check(int recipient)
+{
+    // if the recipient isn't this device or broadcast,
+  if (recipient != localAddress ) {
+    Serial.println("This message is not for me.");
+    return;                             // skip rest of function
+  }
+}
+
+/*-------------------------------------------------- Length check ----------------------------------*/
+
+void length_Check(byte incomingLength, String incoming)
+{
+    if (incomingLength != incoming.length()) {   // check length for error
+    Serial.println("error: message length does not match length");
+    return;                             // skip rest of function
+  }
+}
 
 /*------------------------------------------- LoRa_Sender ----------------------------------*/
 
@@ -36,6 +57,7 @@ String LoRa_Receive()
       while (LoRa.available()) 
     {
         received += (char)LoRa.read();//receives data
+        delay(0);
     }
     return received;
 }
@@ -75,25 +97,7 @@ int onReceive_Alert()
     }
 }
 
-/*-------------------------------------------------- Recepient address check -----------------------------------------*/
-void address_Check(int recipient)
-{
-    // if the recipient isn't this device or broadcast,
-  if (recipient != localAddress ) {
-    Serial.println("This message is not for me.");
-    return;                             // skip rest of function
-  }
-}
 
-/*-------------------------------------------------- Length check ----------------------------------*/
-
-void length_Check(byte incomingLength, String incoming)
-{
-    if (incomingLength != incoming.length()) {   // check length for error
-    Serial.println("error: message length does not match length");
-    return;                             // skip rest of function
-  }
-}
 
 /*-------------------------------------------------- LoRa Receiving Ack Function ----------------------------------------------------------*/
 
@@ -171,9 +175,13 @@ void loop()
   int packetsize = LoRa.parsePacket();
   if(packetsize)
   {
-   if ( onReceive_Alert() == true) 
+    Alert_return_value = onReceive_value();
+   while ( Alert_return_value == true) 
    {
 
+      int packetSize = LoRa.parsePacket();// try to parse packet
+      if (packetSize) 
+        {
     // Give code for speaker here
 
     received_data = LoRa_Receive(); //recieves location data from ambulance
@@ -193,6 +201,7 @@ void loop()
     delay(0);
     }
     }
+   }
    }
   }
 }
