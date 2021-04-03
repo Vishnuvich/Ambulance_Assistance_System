@@ -34,10 +34,11 @@ String LoRa_Receive()
 {
   String received = "";
   // read packet
+  Serial.println("Next");
       while (LoRa.available()) 
     {
+      Serial.println("Inside while");
         received += (char)LoRa.read();//receives data
-        Serial.println(received);
     }
     return received;
 }
