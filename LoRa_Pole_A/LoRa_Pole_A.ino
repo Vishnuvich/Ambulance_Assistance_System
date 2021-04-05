@@ -91,6 +91,7 @@ int onReceive_Alert()
       for (int i=0; i<3; i++)
       {
        LoRa_Sender("A",destination,"Ack Send to 0xAA"); //Send Ack back 
+       delay(500);
       }
        return true;
     }
