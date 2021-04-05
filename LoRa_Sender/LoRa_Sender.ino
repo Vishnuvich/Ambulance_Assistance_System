@@ -56,7 +56,8 @@ void setup() {
   Serial.println("LoRa Sender");
   LoRa.setPins(15,16,4);
 
-  if (!LoRa.begin(473E6)) {
+  if (!LoRa.begin(473E6)) 
+  {
     Serial.println("Starting LoRa failed!");
     while (1);
   }
@@ -64,6 +65,8 @@ void setup() {
 }
 
 void loop() {
+
+  //Code for live GPS
 
 //    while (ss.available() > 0)
 //    if (gps.encode(ss.read()))
@@ -76,6 +79,8 @@ void loop() {
 //    Serial.println(F("No GPS detected: check wiring."));
 //    
 //  }
+
+//Code for static GPS
 
    const char *gpsStream = "$GPRMC,045103.000,A,3014.1984,N,09749.2872,W,0.67,161.46,030913,,,A*7C\r\n";
    while(*gpsStream)
