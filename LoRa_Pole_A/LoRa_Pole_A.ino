@@ -3,7 +3,7 @@
 #include <TinyGPS++.h>
 
 float latitude,longitude;
-int distance, values;
+int distance, Alert_return_value;
 String received_data, outgoing;
 byte localAddress = 0xBB;     // address of this device
 byte destination = 0xAA;      // destination to send to
@@ -37,14 +37,14 @@ void length_Check(byte incomingLength, String incoming)
 
 /*------------------------------------------- LoRa_Sender----------------------------------*/
 
-void LoRa_Sender(String outgoing, byte destination)
+void LoRa_Sender(String outgoing, byte destination, String Mssg)
 {
     LoRa.beginPacket();
     LoRa.write(destination);              // add destination address
     LoRa.write(localAddress);             // add sender address
     LoRa.write(outgoing.length());        // add payload length
     LoRa.print(outgoing);                 // add payload
-    Serial.println("Ack Send");
+    Serial.println(Mssg);
     LoRa.endPacket();
 }
 
@@ -56,12 +56,9 @@ String LoRa_Receive()
   // read packet
      while (LoRa.available()) 
     {
-       Serial.println("Lora recieve function");
         received += (char)LoRa.read();//receives data
-        //Serial.println(received);
         delay(0);
     }
-
     return received;
 }
 /*-------------------------------------- LoRa_Alert Receiving Function -----------------*/
@@ -77,7 +74,6 @@ int onReceive_Alert()
     {
 
       incoming += (char)LoRa.read();
-      Serial.println(incoming);
       delay(0);
     }
 
@@ -92,7 +88,10 @@ int onReceive_Alert()
       Serial.println("Incoming length");
       Serial.println(incomingLength);
       Serial.println(incoming);
-       LoRa_Sender("A",destination); //Send Ack back 
+      for (int i=0; i<3; i++)
+      {
+       LoRa_Sender("A",destination,"Ack Send to 0xAA"); //Send Ack back 
+      }
        return true;
     }
 }
@@ -118,7 +117,9 @@ void onReceive(int packetSize) {
 
   address_Check(recipient);
   length_Check(incomingLength, incoming);
+  
   // if message is for this device, or broadcast, print details:
+  
   if (incoming == "A")
   {
     while(1)
@@ -172,12 +173,11 @@ void loop()
   int packetsize = LoRa.parsePacket();
   if(packetsize)
   {
-   //while ( onReceive_Alert() == true ) 
-   values = onReceive_Alert();
-  while(values == true){
+   Alert_return_value = onReceive_Alert();
+  while(Alert_return_value == true){
 
     // Give code for speaker here
-//     Serial.println("hiiiiiiiiiiiiiiiiiiiiii");
+
   int packetSize = LoRa.parsePacket();// try to parse packet
   if (packetSize) 
   {
@@ -193,7 +193,7 @@ void loop()
      {  
      if(millis() - lastSendTime > interval)//Checking the interval for sending data to next pole
      {
-     LoRa_Sender("To", nxt_destination);//Alerting next pole(Sending to next pole)
+     LoRa_Sender("To", nxt_destination, "Alert to nxt  pole 0xCC");//Alerting next pole(Sending to next pole)
      lastSendTime = millis();
      }
      onReceive(LoRa.parsePacket());//Check for acknowledgement

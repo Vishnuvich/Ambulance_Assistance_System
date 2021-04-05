@@ -37,7 +37,7 @@ String LoRa_Receive()
   Serial.println("Next");
       while (LoRa.available()) 
     {
-      Serial.println("Inside while");
+     
         received += (char)LoRa.read();//receives data
 
     }
