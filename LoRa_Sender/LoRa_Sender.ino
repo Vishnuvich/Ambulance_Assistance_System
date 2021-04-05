@@ -76,8 +76,7 @@ void loop() {
 //    Serial.println(F("No GPS detected: check wiring."));
 //    
 //  }
- 
-//  }
+
    const char *gpsStream = "$GPRMC,045103.000,A,3014.1984,N,09749.2872,W,0.67,161.46,030913,,,A*7C\r\n";
    while(*gpsStream)
     if (gps.encode(*gpsStream++)){
