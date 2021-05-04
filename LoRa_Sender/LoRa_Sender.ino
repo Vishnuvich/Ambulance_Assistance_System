@@ -2,6 +2,17 @@
 #include <LoRa.h>
 #include <TinyGPS++.h>
 #include <SoftwareSerial.h>
+#include <ESP8266WiFi.h>
+#include <FirebaseESP8266.h>
+
+
+//WiFi Details
+#define WIFI_SSID "JioFiber-VISHNU_2_4G"
+#define WIFI_PASSWORD "9037223407"
+
+//Firebase Details
+#define FIREBASE_HOST "advanced-ambulance-as-default-rtdb.firebaseio.com/"
+#define FIREBASE_AUTH "PCbdKjEtMCRH3OJeunOgszyOQSQtt0GTTgfuk5ob"
 
 //For GPS Pins
 static const int RXPin = 4, TXPin = 5;
@@ -12,6 +23,9 @@ static const uint32_t GPSBaud = 9600;
 float lati,longi;
 String longitude, latitude;
 
+
+//Firebase Object
+FirebaseData firebaseData;
 
 // The TinyGPS++ object
 TinyGPSPlus gps;
@@ -27,10 +41,12 @@ void displayInfo()
   if (gps.location.isValid())
   {
     lati = (gps.location.lat());//Latitude float
+    Firebase.setFloat(firebaseData,"Latitude", lati); //Firebase latitude update
     latitude = String(lati,6);//Latitude string
     Serial.print(lati,6); //printing lat in serial monitor
     Serial.print(F(","));
     longi = gps.location.lng();// Longitude float
+    Firebase.setFloat(firebaseData,"Longitude", longi); // Firebase longitude update 
     longitude = String(longi,6);//Longitude string
     Serial.print(longi,6);//printing long in serial monitor
     Serial.println();
@@ -50,10 +66,26 @@ void displayInfo()
 
 void setup() {
   Serial.begin(115200);
+//WiFi Connection
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("Connecting to Wi-Fi");
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    Serial.print(".");
+    delay(300);
+  }
+  Serial.println();
+  Serial.print("Connected with IP: ");
+  Serial.println(WiFi.localIP());
+  Serial.println();
+  
+  //GPS Connection
   ss.begin(GPSBaud);
   while (!Serial);
 
   Serial.println("LoRa Sender");
+
+  //LoRa Connection
   LoRa.setPins(15,16,4);
 
   if (!LoRa.begin(473E6)) 
@@ -61,6 +93,11 @@ void setup() {
     Serial.println("Starting LoRa failed!");
     while (1);
   }
+
+  //Firebase Connection
+  
+  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+  Firebase.reconnectWiFi(true);
 
 }
 
